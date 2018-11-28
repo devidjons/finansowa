@@ -1,10 +1,13 @@
+#############################
+#opcje na google 2019/02/15
+#############################
 library(dplyr)
 library(openxlsx)
 data = read.xlsx("googl_opt.xlsx")
 data$r = 0.027
 head(data)
 data_by_ask = data %>% filter(Open.Interest > 0)
-data_by_last_price = data %>% filter(Open.Interest == 0, Volume > 0)
+data_by_last_price = data %>% filter( Volume > 0)
 d1 = function(S, K, r, sigma, Time)
 {
     #d1 from BS formula
@@ -23,15 +26,37 @@ call_opt_price = function(S, K, r, sigma, Time)
     return(S * pnorm(d1(S, K, r, sigma, Time)) - K * exp(-r * Time) * pnorm(d2(S, K, r, sigma, Time)))
 }
 
-get_volatility=function(n, data, price_colname)
+
+get_volatility = function(n, data, price_colname)
 {
-    S=data$S[n]
-    K=data$Strike[n]
-    r=data$r[n]
-    Time=data$T[n]
-    price=data[n,price_colname]
-    #return(uniroot(function(vol) call_opt_price(S,K,r,vol,Time)-price, interval = c(0.001,8.8))$root)
-    print(paste0(call_opt_price(S,K,r,0.000001,Time)," ", price))
+    #wylicza volatility na postawie (BS_formula(vol)-call_price)^2 ->min
+    ################################
+    
+    #initial parameters
+    S = data$S[n]
+    K = data$Strike[n]
+    r = data$r[n]
+    Time = data$T[n]
+    price = data[n, price_colname]
+    #
+    
+    #ciag volatility
+    vol = seq(0.01, 0.9, by = 0.01)
+    #
+    
+    #wartosci (BS_formula(vol)-call_price)^2
+    vols=sapply(vol, function(x) (call_opt_price(S, K, r, x, Time) - price) ^ 2)
+    #
+    
+    #wybieramy volatility o najmniejszej roznice
+    vol[which.min(vols)] %>%
+        return
 }
-get_volatility(3,data_by_ask, "Ask")
-data_by_ask[5,]
+
+#dla kazdego wiersza wyliczyc volatility implikowana
+result = sapply(1:dim(data_by_last_price)[1], function(x)
+    c(
+        data_by_last_price[x, "Strike"],
+        get_volatility(x, data_by_last_price, "Last.Price")
+    )) %>% t
+plot(result)
