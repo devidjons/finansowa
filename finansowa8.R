@@ -1,5 +1,22 @@
-#############################
 library(dplyr)
+#############################
+#initial parameters
+S=100
+K=90
+r=0.03
+sigma=0.2
+Time=1
+N_step=1000
+N_simulations=10000
+#############################
+
+get_stock_path = function(Time, sigma, N_step, S0,r)
+{
+        dt=Time/N_step
+        winner_diff=rnorm(N_step)*sigma*sqrt(dt)
+        S=S0*cumprod(1+r*dt+winner_diff)
+        return(c(S0,S))
+}
 d1 = function(S, K, r, sigma, Time)
 {
     #d1 from BS formula

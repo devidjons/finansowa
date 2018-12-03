@@ -6,7 +6,7 @@ library(openxlsx)
 data = read.xlsx("googl_opt.xlsx")
 data$r = 0.027
 head(data)
-data_by_ask = data %>% filter(Open.Interest > 0)
+data_by_ask = data %>% filter(Ask > 0) %>% mutate(price=(Bid+Ask)/2)
 data_by_last_price = data %>% filter( Volume > 0)
 d1 = function(S, K, r, sigma, Time)
 {
@@ -54,9 +54,9 @@ get_volatility = function(n, data, price_colname)
 }
 
 #dla kazdego wiersza wyliczyc volatility implikowana
-result = sapply(1:dim(data_by_last_price)[1], function(x)
+result = sapply(1:dim(data_by_ask)[1], function(x)
     c(
-        data_by_last_price[x, "Strike"],
-        get_volatility(x, data_by_last_price, "Last.Price")
+        data_by_ask[x, "Strike"],
+        get_volatility(x, data_by_ask, "price")
     )) %>% t
-plot(result)
+plot(result[result[,2]>0.1,]) #wyrzucam outliers
