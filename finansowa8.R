@@ -34,3 +34,13 @@ call_opt_price = function(S, K, r, sigma, Time)
     #call option price from BS formula
     return(S * pnorm(d1(S, K, r, sigma, Time)) - K * exp(-r * Time) * pnorm(d2(S, K, r, sigma, Time)))
 }
+
+#cena opcji metoda monte carlo
+
+
+(sapply(1:N_simulations, function(x)
+                        (get_stock_path(Time, sigma, N_step, S, r)[N_step + 1]) - K) * exp(-r * Time)) %>% 
+    mean ->
+    simulation_price
+theoretical_price=call_opt_price(S,K,r,sigma,Time)
+print(paste("theoretical price =", theoretical_price, " simulation_price =", simulation_price))
