@@ -12,15 +12,16 @@ N_simulations=10000
 
 get_stock_path = function(Time, sigma, N_step, S0,r)
 {
-        dt=Time/N_step
-        winner_diff=rnorm(N_step)*sigma*sqrt(dt)
-        S=S0*cumprod(1+r*dt+winner_diff)
+        dt=Time / N_step
+        winner_diff = rnorm(N_step)*sigma*sqrt(dt)
+        S=S0*cumprod(1+ r*dt+winner_diff)
         return(c(S0,S))
 }
 d1 = function(S, K, r, sigma, Time)
 {
     #d1 from BS formula
-    return((log(S / K) + (r + (sigma ^ 2) / 2)*Time) / (sigma*sqrt(Time)))
+    return((log(S / K) + (r + (sigma ^ 2) / 2)*Time) /
+               (sigma*sqrt(Time)))
 }
 
 d2 = function(S, K, r, sigma, Time)
@@ -39,7 +40,7 @@ call_opt_price = function(S, K, r, sigma, Time)
 
 
 (sapply(1:N_simulations, function(x)
-                        (get_stock_path(Time, sigma, N_step, S, r)[N_step + 1]) - K) * exp(-r * Time)) %>% 
+                        max((get_stock_path(Time, sigma, N_step, S, r)[N_step + 1]) - K,0)) * exp(-r * Time)) %>% 
     mean ->
     simulation_price
 theoretical_price=call_opt_price(S,K,r,sigma,Time)
