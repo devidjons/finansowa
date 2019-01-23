@@ -44,4 +44,4 @@ call_opt_price = function(S, K, r, sigma, Time)
     mean ->
     simulation_price
 theoretical_price=call_opt_price(S,K,r,sigma,Time)
-print(paste("theoretical price =", theoretical_price, " simulation_price =", simulation_price))
+print(paste("theoretical price =", theoretical_price, " simulation_price =", simulation_price)) #"theoretical price = 15.4292272402319  simulation_price = 15.6184822476156"
