@@ -59,4 +59,4 @@ result = sapply(1:dim(data_by_ask)[1], function(x)
         data_by_ask[x, "Strike"],
         get_volatility(x, data_by_ask, "price")
     )) %>% t
-plot(result[result[,2]>0.1,]) #wyrzucam outliers
+plot(result[result[,2]>0.05,]) #wyrzucam outliers
